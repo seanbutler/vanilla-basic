@@ -238,6 +238,8 @@ namespace tokenizer
 
         while ( currentPosition < len ) 
         {
+            currentChar = inputString[currentPosition];
+            
             //
             // skip whitespace
             //
