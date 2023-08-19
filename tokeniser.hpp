@@ -21,6 +21,39 @@ namespace tokenizer {
 
     // --------------------------------------------------
 
+    void tokenize_string(const std::string & inputString,
+                        unsigned int & currentPosition,
+                        std::vector<Token> & tokens) 
+    {
+        char currentChar = inputString[currentPosition];
+        
+        if (currentChar=='\"')
+            currentPosition++; // skip the leading quote character
+    
+        currentChar = inputString[currentPosition];
+        currentPosition++;
+
+        std::string whole_string = "";
+        
+        while ( currentChar != '\"') 
+        {
+            whole_string += currentChar;
+            
+            currentChar = inputString[currentPosition];
+            currentPosition++;
+        }
+
+        --currentPosition;
+
+        Token new_token;
+        new_token.type = Token::TokenTypeEnum::STRING;
+        new_token.string = whole_string;
+
+        tokens.push_back(new_token);
+    }
+ 
+    // --------------------------------------------------
+
     void tokenize_number(const std::string & inputString,
                         unsigned int & currentPosition,
                         std::vector<Token> & tokens) 
@@ -84,13 +117,19 @@ namespace tokenizer {
             if ( currentChar == '\n' ) {
                 break;
             }
-
-            //
-            // digit found, so probably number (all numbers are floats in our langauge, because hey 64 bits etc) 
-            //
-            if ( isdigit(currentChar) )            
+            else if ( isdigit(currentChar) )            
             {
+                //
+                // digit found, so probably number (all numbers are floats in our langauge, because hey 64 bits etc) 
+                //
                 tokenize_number(inputString, currentPosition, tokens);
+            }
+            else if ( currentChar == '\"')            
+            {
+                //
+                // quote found, so probably a string 
+                //
+                tokenize_string(inputString, currentPosition, tokens);
             }
             
             currentPosition+=1;

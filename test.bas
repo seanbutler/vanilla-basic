@@ -5,3 +5,6 @@
 2048.01
 4096.101
 8192
+
+"this is a string"
+"this is also a string, or is it?"
