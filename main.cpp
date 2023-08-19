@@ -23,7 +23,6 @@ int main(int argc, char** argv)
     for(auto token : line_tokens ) {
         std::cout << token << std::endl;
     }
-    
     return 0;
 }
 

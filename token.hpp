@@ -84,30 +84,30 @@ public:
         "TOK_REM",
     };
 
-    inline static std::map<std::string, TokenEnum> keywords = {   
-        { "null",       TokenEnum::TOK_NULL     },
+    // inline static std::map<std::string, TokenEnum> keywords = {   
+    //     { "null",       TokenEnum::TOK_NULL     },
 
-        { "let",        TokenEnum::TOK_LET      },
-        { "dim",        TokenEnum::TOK_DIM      },
+    //     { "let",        TokenEnum::TOK_LET      },
+    //     { "dim",        TokenEnum::TOK_DIM      },
 
-        { "if",         TokenEnum::TOK_IF       },
-        { "then",       TokenEnum::TOK_THEN     },
+    //     { "if",         TokenEnum::TOK_IF       },
+    //     { "then",       TokenEnum::TOK_THEN     },
 
-        { "for",        TokenEnum::TOK_FOR      },
-        { "to",         TokenEnum::TOK_TO       },
-        { "next",       TokenEnum::TOK_NEXT     },
+    //     { "for",        TokenEnum::TOK_FOR      },
+    //     { "to",         TokenEnum::TOK_TO       },
+    //     { "next",       TokenEnum::TOK_NEXT     },
 
-        { "while",      TokenEnum::TOK_WHILE    },
-        { "wend",       TokenEnum::TOK_ENDWHILE },
+    //     { "while",      TokenEnum::TOK_WHILE    },
+    //     { "wend",       TokenEnum::TOK_ENDWHILE },
 
-        { "input",      TokenEnum::TOK_INPUT    },
-        { "print",      TokenEnum::TOK_PRINT    },
+    //     { "input",      TokenEnum::TOK_INPUT    },
+    //     { "print",      TokenEnum::TOK_PRINT    },
 
-        { "goto",       TokenEnum::TOK_GOTO     },
-        { "gosub",      TokenEnum::TOK_GOSUB    },
-        { "return",     TokenEnum::TOK_RETURN   },
-        { "rem",        TokenEnum::TOK_REM      }
-    };
+    //     { "goto",       TokenEnum::TOK_GOTO     },
+    //     { "gosub",      TokenEnum::TOK_GOSUB    },
+    //     { "return",     TokenEnum::TOK_RETURN   },
+    //     { "rem",        TokenEnum::TOK_REM      }>
+    // };
 
     inline static std::string _symbols_debug_table[] = {
         "?",
@@ -122,7 +122,7 @@ public:
 
     enum SymbolEnum : int {
         TOK_UNKNOWN = 0, 
-        TOK_EQUAL, 
+        TOK_EQUALS, 
         TOK_NOTEQUAL, 
         TOK_ADD, TOK_SUB, TOK_MUL, TOK_DIV, 
         TOK_GREATERTHAN, TOK_LESSTHAN,  
