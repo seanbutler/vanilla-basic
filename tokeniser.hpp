@@ -227,7 +227,7 @@ namespace tokenizer
 
     // --------------------------------------------------
 
-    void tokenize_line(const std::string & inputString,
+    bool tokenize_line(const std::string & inputString,
                         std::vector<Token> & tokens) 
     {
         unsigned int currentPosition = 0;
@@ -251,7 +251,7 @@ namespace tokenizer
             // exit on carriage return
             //
             if ( currentChar == '\n' ) {
-                break;
+                return false;
             }
             else if ( isdigit(currentChar) )            
             {
@@ -277,7 +277,7 @@ namespace tokenizer
             else if ( isalpha(currentChar))
             {
                 int tmpCurrentPosition = currentPosition;
-                if ( ! tokenize_keyword(inputString, currentPosition, tokens) )
+                if ( tokenize_keyword(inputString, currentPosition, tokens) == false )
                 {
                     currentPosition = tmpCurrentPosition;
                     tokenize_identifier(inputString, currentPosition, tokens);
@@ -286,6 +286,7 @@ namespace tokenizer
             currentPosition+=1;
 
         }
+        return true;
     }
 
     // --------------------------------------------------
