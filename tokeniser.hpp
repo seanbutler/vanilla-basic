@@ -227,11 +227,13 @@ namespace tokenizer
 
     // --------------------------------------------------
 
-    bool tokenize_line(const std::string & inputString,
+    unsigned int tokenize_line(const std::string & inputString,
                         std::vector<Token> & tokens) 
     {
         unsigned int currentPosition = 0;
         char currentChar;
+        unsigned int token_count=0;
+
 
         currentChar = inputString[currentPosition];
         const unsigned int len = inputString.length();
@@ -251,7 +253,7 @@ namespace tokenizer
             // exit on carriage return
             //
             if ( currentChar == '\n' ) {
-                return false;
+                break;
             }
             else if ( isdigit(currentChar) )            
             {
@@ -259,6 +261,7 @@ namespace tokenizer
                 // digit found, so probably number (all numbers are floats in our langauge, because hey 64 bits etc) 
                 //
                 tokenize_number(inputString, currentPosition, tokens);
+                token_count++;
             }
             else if ( currentChar == '\"')            
             {
@@ -266,6 +269,7 @@ namespace tokenizer
                 // quote found, so probably a string 
                 //
                 tokenize_string(inputString, currentPosition, tokens);
+                token_count++;
             }
             else if ( currentChar == '=' || ispunct(currentChar))            
             {
@@ -273,6 +277,7 @@ namespace tokenizer
                 // its punctuation, so probably a symbol of some kind, like an operator or bracket 
                 //
                 tokenize_symbol(inputString, currentPosition, tokens);
+                token_count++;
             }
             else if ( isalpha(currentChar))
             {
@@ -282,11 +287,12 @@ namespace tokenizer
                     currentPosition = tmpCurrentPosition;
                     tokenize_identifier(inputString, currentPosition, tokens);
                 }
+                token_count++;
             }
             currentPosition+=1;
 
         }
-        return true;
+        return token_count;
     }
 
     // --------------------------------------------------
