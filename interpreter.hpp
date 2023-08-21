@@ -19,11 +19,6 @@ namespace Interpreter {
 
         Token source;
         Token destination;
-
-        // these are in effect registers 
-        // Token value;
-        // std::map<std::string, Token>::iterator destination_itor;
-
     };
 
     // ------------------------------------------------------------
@@ -44,6 +39,8 @@ namespace Interpreter {
                                     std::map<unsigned int, std::vector<Token>> & tokens,
                                     const std::string & message ) 
     {
+        return;
+
         std::cerr << context.filename
                 << " (" << (*context.current_line_itor).first << ") : info - " 
                 << message
@@ -117,8 +114,10 @@ namespace Interpreter {
         }
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOTO ) {
-            Interpreter::report_execution_info(context, tokens,  "goto" );
+            Interpreter::report_execution_info(context, tokens,  "got goto" );
             
+            context.current_token_itor++;
+
            if ( execute_rhs_expression(context, tokens) == false ) {
                 Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
                 return false;                
@@ -128,12 +127,24 @@ namespace Interpreter {
             // OK IF WE GOT HERE THEN 
             //  SET LINE ITERATOR TO THE DESTINATION
             //
+            if ( context.destination.type == Token::TokenTypeEnum::NUMBER )
+            {
+                context.current_line_itor = tokens.find(context.destination.number);
+                return true;
+            }
+            else if ( context.destination.type == Token::TokenTypeEnum::IDENTIFIER )
+            {
+                context.current_line_itor = tokens.find(context.variables[context.destination.string].number);
+                return true;
+            }
 
-            return true;
+            return false;                
         }
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOSUB ) {
             Interpreter::report_execution_info(context, tokens,  "gosub" );
+
+            context.current_token_itor++;
 
            if ( execute_rhs_expression(context, tokens) == false ) {
                 Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
@@ -152,6 +163,8 @@ namespace Interpreter {
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_RETURN ) {
             Interpreter::report_execution_info(context, tokens,  "return" );
 
+            context.current_token_itor++;
+
             //  SET LINE ITERATOR TO THE LINE RETURN VARIABLE
 
             return true;
@@ -159,6 +172,8 @@ namespace Interpreter {
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_INPUT ) {
             Interpreter::report_execution_info(context, tokens,  "input" );
+
+            context.current_token_itor++;
 
             if ( execute_lhs_expression(context, tokens) == false) {
                 Interpreter::report_execution_error(context, tokens,  "expression lhs execution problem" );
@@ -184,7 +199,6 @@ namespace Interpreter {
             }
 
             std::cout << context.source << std::endl;
-            std::cout << context.destination << std::endl;
 
             return true;
         }
