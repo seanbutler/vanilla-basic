@@ -17,8 +17,12 @@ namespace Interpreter {
 
         std::map<std::string, Token> variables;
 
-        float value;
-        std::string destination;        
+        Token source;
+        Token destination;
+
+        // these are in effect registers 
+        // Token value;
+        // std::map<std::string, Token>::iterator destination_itor;
 
     };
 
@@ -44,7 +48,7 @@ namespace Interpreter {
                 << " (" << (*context.current_line_itor).first << ") : info - " 
                 << message
                 << " at or near " 
-                << (*context.current_token_itor) 
+                << (*context.current_token_itor)
                 << std::endl;
     }
 
@@ -55,9 +59,10 @@ namespace Interpreter {
     {
         if ((*context.current_token_itor).type == Token::TokenTypeEnum::IDENTIFIER ) {
 
-            context.destination = (*context.current_token_itor).string;
+            context.destination = (*context.current_token_itor);
 
             return true;
+
         }
 
         Interpreter::report_execution_error(context, tokens, "lhs expression problem" );
@@ -72,12 +77,14 @@ namespace Interpreter {
 
         if ((*context.current_token_itor).type == Token::TokenTypeEnum::IDENTIFIER ) 
         {
-            context.value = context.variables[(*context.current_token_itor).string].number;
+            context.source = context.variables[context.current_token_itor->string];
+
             return true;
         }
         else if ((*context.current_token_itor).type == Token::TokenTypeEnum::NUMBER ) 
         {
-            context.value = (*context.current_token_itor).number;
+            context.source = (*context.current_token_itor); 
+
             return true;
         }
 
@@ -108,22 +115,6 @@ namespace Interpreter {
             Interpreter::report_execution_info(context, tokens,  "comment" );
             return true;
         }
-
-        // if ((*context.current_token_itor).token == Token::TokenEnum::TOK_PRINT ) {
-        //     Interpreter::report_execution_info(context, tokens,  "print" );
-
-        //     if ( execute_rhs_expression(context, tokens) == false ) {
-        //         Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
-        //         return false;                
-        //     }
-
-        //     //
-        //     // OK IF WE GOT HERE THEN 
-        //     //  STD::COUT THE RESULT
-        //     //
-
-        //     return true;
-        // }
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOTO ) {
             Interpreter::report_execution_info(context, tokens,  "goto" );
@@ -192,7 +183,8 @@ namespace Interpreter {
                 return false;                
             }
 
-            std::cout << context.value << std::endl;
+            std::cout << context.source << std::endl;
+            std::cout << context.destination << std::endl;
 
             return true;
         }
@@ -225,7 +217,8 @@ namespace Interpreter {
             // OK IF WE GOT HERE THEN WRITE THE VALUE TO THE DESTINATION
             //
 
-            context.variables[context.destination] = context.value;
+            context.variables[context.destination.string] = context.source;
+
             return true;
         }
 
