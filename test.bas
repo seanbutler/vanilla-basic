@@ -1,7 +1,5 @@
 10 rem hello world
-15 dim arr ( 10 )
-20 rem let x = x + ( 1.0 / ( 2.12 * 4.05 ) + 8.50 ) 
-30 print x
-40 goto 20
-
-
+20 let x = 8 
+30 let y = 16 
+40 print y
+50 print x

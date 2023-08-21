@@ -14,37 +14,78 @@ namespace Interpreter {
         std::string filename;
         std::map<unsigned int, std::vector<Token>>::iterator current_line_itor;
         std::vector<Token>::iterator current_token_itor;
+
+        std::map<std::string, Token> variables;
+
+        float value;
+        std::string destination;        
+
     };
+
+    // ------------------------------------------------------------
 
     void report_execution_error( Interpreter::Context & context, 
                                     std::map<unsigned int, std::vector<Token>> & tokens,
                                     const std::string & message ) 
     {
-        std::cerr << context.filename 
+        std::cerr << context.filename
                 << " (" << (*context.current_line_itor).first << ") : error - " 
-                << message << std::endl;
+                << message
+                << " at or near " 
+                << (*context.current_token_itor) 
+                << std::endl;
     }
 
     void report_execution_info( Interpreter::Context & context, 
                                     std::map<unsigned int, std::vector<Token>> & tokens,
                                     const std::string & message ) 
     {
-        std::cerr << context.filename 
+        std::cerr << context.filename
                 << " (" << (*context.current_line_itor).first << ") : info - " 
-                << message << std::endl;
+                << message
+                << " at or near " 
+                << (*context.current_token_itor) 
+                << std::endl;
     }
+
+    // ------------------------------------------------------------
 
     bool execute_lhs_expression(Interpreter::Context & context, 
                             std::map<unsigned int, std::vector<Token>> & tokens)
     {
+        if ((*context.current_token_itor).type == Token::TokenTypeEnum::IDENTIFIER ) {
+
+            context.destination = (*context.current_token_itor).string;
+
+            return true;
+        }
+
+        Interpreter::report_execution_error(context, tokens, "lhs expression problem" );
         return false;
     }
+
+    // ------------------------------------------------------------
 
     bool execute_rhs_expression(Interpreter::Context & context, 
                             std::map<unsigned int, std::vector<Token>> & tokens)
     {
+
+        if ((*context.current_token_itor).type == Token::TokenTypeEnum::IDENTIFIER ) 
+        {
+            context.value = context.variables[(*context.current_token_itor).string].number;
+            return true;
+        }
+        else if ((*context.current_token_itor).type == Token::TokenTypeEnum::NUMBER ) 
+        {
+            context.value = (*context.current_token_itor).number;
+            return true;
+        }
+
+        Interpreter::report_execution_error(context, tokens,  "rhs expression problem" );
         return false;
     }
+
+    // ------------------------------------------------------------
 
     bool execute_token_vector(Interpreter::Context & context, 
                             std::map<unsigned int, std::vector<Token>> & tokens)
@@ -68,21 +109,21 @@ namespace Interpreter {
             return true;
         }
 
-        if ((*context.current_token_itor).token == Token::TokenEnum::TOK_PRINT ) {
-            Interpreter::report_execution_info(context, tokens,  "print" );
+        // if ((*context.current_token_itor).token == Token::TokenEnum::TOK_PRINT ) {
+        //     Interpreter::report_execution_info(context, tokens,  "print" );
 
-            if ( execute_rhs_expression(context, tokens) == false ) {
-                Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
-                return false;                
-            }
+        //     if ( execute_rhs_expression(context, tokens) == false ) {
+        //         Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
+        //         return false;                
+        //     }
 
-            //
-            // OK IF WE GOT HERE THEN 
-            //  STD::COUT THE RESULT
-            //
+        //     //
+        //     // OK IF WE GOT HERE THEN 
+        //     //  STD::COUT THE RESULT
+        //     //
 
-            return true;
-        }
+        //     return true;
+        // }
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOTO ) {
             Interpreter::report_execution_info(context, tokens,  "goto" );
@@ -137,29 +178,43 @@ namespace Interpreter {
             // OK IF WE GOT HERE THEN WRITE THE VALUE TO THE DESTINATION
             //
 
-            // (*context.destination) = context.expression_value;
-
 
             return true;
         }
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_PRINT ) {
-            Interpreter::report_execution_info(context, tokens,  "print" );
+            Interpreter::report_execution_info(context, tokens,  "got print" );
+
+            context.current_token_itor++;
+
+            if ( execute_rhs_expression(context, tokens) == false ) {
+                Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
+                return false;                
+            }
+
+            std::cout << context.value << std::endl;
+
             return true;
         }
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_LET ) {
-            Interpreter::report_execution_info(context, tokens,  "let" );
-
+            Interpreter::report_execution_info(context, tokens,  "got let" );
+            
+            context.current_token_itor++;
+            
             if ( execute_lhs_expression(context, tokens) == false) {
                 Interpreter::report_execution_error(context, tokens,  "expression lhs execution problem" );
                 return false;
             }
 
+            context.current_token_itor++;
+
             if ((*context.current_token_itor).symbol != Token::SymbolEnum::TOK_EQUALS ) {
                 Interpreter::report_execution_error(context, tokens,  "expected equals/assignment after expression lhs" );
                 return false;                
             }
+
+            context.current_token_itor++;
 
             if ( execute_rhs_expression(context, tokens) == false ) {
                 Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
@@ -170,17 +225,21 @@ namespace Interpreter {
             // OK IF WE GOT HERE THEN WRITE THE VALUE TO THE DESTINATION
             //
 
-            // (*context.destination) = context.expression_value;
-
+            context.variables[context.destination] = context.value;
+            return true;
         }
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_DIM ) {
             Interpreter::report_execution_info(context, tokens,  "dim" );
             
+            context.current_token_itor++;
+
             if ( execute_lhs_expression(context, tokens) == false) {
                 Interpreter::report_execution_error(context, tokens,  "expression lhs execution problem" );
                 return false;
             }
+
+            context.current_token_itor++;
 
             if ((*context.current_token_itor).symbol != Token::SymbolEnum::TOK_LPAREN ) {
                 Interpreter::report_execution_error(context, tokens,  "expected left parenthesis before array dimension expression" );
@@ -193,6 +252,8 @@ namespace Interpreter {
                 Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
                 return false;                
             }
+
+            context.current_token_itor++;
 
             if ((*context.current_token_itor).symbol != Token::SymbolEnum::TOK_RPAREN ) {
                 Interpreter::report_execution_error(context, tokens,  "expected right parenthesis after array dimension expression" );

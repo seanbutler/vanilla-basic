@@ -84,30 +84,6 @@ public:
         "TOK_REM",
     };
 
-    // inline static std::map<std::string, TokenEnum> keywords = {   
-    //     { "null",       TokenEnum::TOK_NULL     },
-
-    //     { "let",        TokenEnum::TOK_LET      },
-    //     { "dim",        TokenEnum::TOK_DIM      },
-
-    //     { "if",         TokenEnum::TOK_IF       },
-    //     { "then",       TokenEnum::TOK_THEN     },
-
-    //     { "for",        TokenEnum::TOK_FOR      },
-    //     { "to",         TokenEnum::TOK_TO       },
-    //     { "next",       TokenEnum::TOK_NEXT     },
-
-    //     { "while",      TokenEnum::TOK_WHILE    },
-    //     { "wend",       TokenEnum::TOK_ENDWHILE },
-
-    //     { "input",      TokenEnum::TOK_INPUT    },
-    //     { "print",      TokenEnum::TOK_PRINT    },
-
-    //     { "goto",       TokenEnum::TOK_GOTO     },
-    //     { "gosub",      TokenEnum::TOK_GOSUB    },
-    //     { "return",     TokenEnum::TOK_RETURN   },
-    //     { "rem",        TokenEnum::TOK_REM      }>
-    // };
 
     inline static std::string _symbols_debug_table[] = {
         "?",
