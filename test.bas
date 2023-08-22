@@ -1,8 +1,12 @@
-10 rem hello world
-20 let x = 8 
-30 let y = 16 
-40 let z = 20 
-50 print y
-60 print x
-70 print z
-80 goto z
+100 print 100
+
+200 gosub 2000
+210 gosub 1000
+
+300 goto 100
+
+1000 print 1111
+1010 return
+
+2000 print 2222
+2010 return

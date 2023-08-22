@@ -6,6 +6,7 @@
 
 #include <map>
 #include <vector>
+#include <stack>
 
 namespace Interpreter {
 
@@ -14,7 +15,7 @@ namespace Interpreter {
         std::string filename;
         std::map<unsigned int, std::vector<Token>>::iterator current_line_itor;
         std::vector<Token>::iterator current_token_itor;
-
+        std::stack<std::map<unsigned int, std::vector<Token>>::iterator> gosub_return_destination_stack;
         std::map<std::string, Token> variables;
 
         Token source;
@@ -75,13 +76,11 @@ namespace Interpreter {
         if ((*context.current_token_itor).type == Token::TokenTypeEnum::IDENTIFIER ) 
         {
             context.source = context.variables[context.current_token_itor->string];
-
             return true;
         }
         else if ((*context.current_token_itor).type == Token::TokenTypeEnum::NUMBER ) 
         {
-            context.source = (*context.current_token_itor); 
-
+            context.source = (*context.current_token_itor);
             return true;
         }
 
@@ -110,6 +109,7 @@ namespace Interpreter {
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_REM ) {
             Interpreter::report_execution_info(context, tokens,  "comment" );
+            context.current_line_itor++;
             return true;
         }
 
@@ -123,22 +123,18 @@ namespace Interpreter {
                 return false;                
             }
 
-            //
-            // OK IF WE GOT HERE THEN 
-            //  SET LINE ITERATOR TO THE DESTINATION
-            //
-            if ( context.destination.type == Token::TokenTypeEnum::NUMBER )
+            if ( context.source.type == Token::TokenTypeEnum::NUMBER )
             {
-                context.current_line_itor = tokens.find(context.destination.number);
+                context.current_line_itor = tokens.find(context.source.number);
                 return true;
             }
-            else if ( context.destination.type == Token::TokenTypeEnum::IDENTIFIER )
+            else if ( context.source.type == Token::TokenTypeEnum::IDENTIFIER )
             {
-                context.current_line_itor = tokens.find(context.variables[context.destination.string].number);
+                context.current_line_itor = tokens.find((context.variables[context.source.string]).number);
                 return true;
             }
 
-            return false;                
+            return true;                
         }
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOSUB ) {
@@ -152,10 +148,25 @@ namespace Interpreter {
             }
 
             //
-            // OK IF WE GOT HERE THEN...
-            //  SET LINE ITERATOR TO THE DESTINATION
             //  SET LINE RETURN VARIABLE TO THE TO CURRENT LINE
             //
+
+            context.gosub_return_destination_stack.push(context.current_line_itor++); 
+
+            //
+            //  SET LINE ITERATOR TO THE DESTINATION
+            //
+
+            if ( context.source.type == Token::TokenTypeEnum::NUMBER )
+            {
+                context.current_line_itor = tokens.find(context.source.number);
+                return true;
+            }
+            else if ( context.source.type == Token::TokenTypeEnum::IDENTIFIER )
+            {
+                context.current_line_itor = tokens.find(context.variables[context.source.string].number);
+                return true;
+            }
 
             return true;
         }
@@ -163,9 +174,10 @@ namespace Interpreter {
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_RETURN ) {
             Interpreter::report_execution_info(context, tokens,  "return" );
 
-            context.current_token_itor++;
+            context.current_line_itor = context.gosub_return_destination_stack.top(); 
+            context.gosub_return_destination_stack.pop(); 
 
-            //  SET LINE ITERATOR TO THE LINE RETURN VARIABLE
+            context.current_line_itor++;
 
             return true;
         }
@@ -184,7 +196,7 @@ namespace Interpreter {
             // OK IF WE GOT HERE THEN WRITE THE VALUE TO THE DESTINATION
             //
 
-
+            context.current_line_itor++;
             return true;
         }
 
@@ -200,6 +212,7 @@ namespace Interpreter {
 
             std::cout << context.source << std::endl;
 
+            context.current_line_itor++;
             return true;
         }
 
@@ -233,6 +246,7 @@ namespace Interpreter {
 
             context.variables[context.destination.string] = context.source;
 
+            context.current_line_itor++;
             return true;
         }
 
@@ -270,8 +284,9 @@ namespace Interpreter {
             //
             // OK IF WE GOT HERE THEN DECLARE THE ARRAY TO THE SIZE OF THE EXPRESSION
             //
-
         }
+
+        // context.current_line_itor++;
         return true;
     }
 
@@ -283,7 +298,7 @@ namespace Interpreter {
 
         while ( ( context.current_line_itor != tokens.end() && status != false )) {
             status = execute_token_vector(context, tokens);
-            context.current_line_itor++;
+            
         }
     }
 }
