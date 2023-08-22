@@ -73,19 +73,124 @@ namespace Interpreter {
                             std::map<unsigned int, std::vector<Token>> & tokens)
     {
 
-        if ((*context.current_token_itor).type == Token::TokenTypeEnum::IDENTIFIER ) 
-        {
-            context.source = context.variables[context.current_token_itor->string];
-            return true;
-        }
-        else if ((*context.current_token_itor).type == Token::TokenTypeEnum::NUMBER ) 
-        {
-            context.source = (*context.current_token_itor);
-            return true;
-        }
+        std::stack<Token> expression_value_stack;
+        std::stack<Token> expression_symbol_stack;
+        Token val1, val2, op, res;
 
-        Interpreter::report_execution_error(context, tokens,  "rhs expression problem" );
-        return false;
+
+        while ( ( context.current_token_itor != (*context.current_line_itor).second.end() )    
+                && ( (*context.current_token_itor).type != Token::TokenTypeEnum::KEYWORD ) 
+                &&  ( (*context.current_token_itor).symbol != Token::SymbolEnum::TOK_RBRACKET ) )  
+        {
+            if ((*context.current_token_itor).type == Token::TokenTypeEnum::NUMBER ) 
+            {
+                expression_value_stack.push((*context.current_token_itor));
+            }
+            else if ((*context.current_token_itor).type == Token::TokenTypeEnum::IDENTIFIER ) 
+            {
+                expression_value_stack.push((*context.current_token_itor));
+            }
+            else if ( (*context.current_token_itor).type == Token::TokenTypeEnum::SYMBOL ) 
+            {
+                expression_symbol_stack.push((*context.current_token_itor));
+            }
+
+            context.current_token_itor++;
+
+            while ( !expression_symbol_stack.empty() && ( expression_value_stack.size() >= 2 ) )
+            {
+
+                //
+                // get the 2 values
+                //
+
+                if ( expression_value_stack.top().type == Token::TokenTypeEnum::IDENTIFIER )
+                {
+                    val2 = context.variables[expression_value_stack.top().string];
+                }                
+                else // assume its a value
+                {
+                    val2 = expression_value_stack.top().number;
+                }                
+                expression_value_stack.pop();
+
+                if ( expression_value_stack.top().type == Token::TokenTypeEnum::IDENTIFIER )
+                {
+                    val1 = context.variables[expression_value_stack.top().string];
+                }                
+                else // assume its a value
+                {
+                    val1 = expression_value_stack.top().number;
+                }                
+                expression_value_stack.pop();
+
+
+                //
+                // get the operator
+                //
+                op = expression_symbol_stack.top();
+                expression_symbol_stack.pop();
+
+                switch(op.symbol) {
+                    case Token::SymbolEnum::TOK_ADD:
+                        res.number = val1.number + val2.number;
+                        break;
+
+                    case Token::SymbolEnum::TOK_SUB:
+                        res.number = val1.number - val2.number;
+                        break;
+                    
+                    case Token::SymbolEnum::TOK_MUL:
+                        res.number = val1.number * val2.number;
+                        break;
+
+                    case Token::SymbolEnum::TOK_DIV:
+                        res.number = val1.number / val2.number;
+                        break;
+
+                    case Token::SymbolEnum::TOK_EQUALS:
+                        res.number = (float)(val1.number == val2.number);
+                        break;
+
+                    case Token::SymbolEnum::TOK_NOTEQUAL:
+                        res.number = (float)(val1.number != val2.number);
+                        break;
+
+                    case Token::SymbolEnum::TOK_GREATERTHAN:
+                        res.number = (float)val1.number > val2.number;
+                        break;
+
+                    case Token::SymbolEnum::TOK_GREATERTHANEQUAL:
+                        res.number = (float)val1.number >= val2.number;
+                        break;
+
+                    case Token::SymbolEnum::TOK_LESSTHAN:
+                        res.number = (float)val1.number < val2.number;
+                        break;
+
+                    case Token::SymbolEnum::TOK_LESSTHANEQUAL:
+                        res.number = (float)val1.number <= val2.number;
+                        break;  
+
+                    case Token::SymbolEnum::TOK_RBRACKET:
+                        std::cout << "IMPOSSIBLE Right Bracket, Now What?" << std::endl;
+                        return false;
+
+                    default:
+                        std::cout << "Unknown Expression Error" << std::endl;
+                        return false;
+                }
+
+                res.type = Token::TokenTypeEnum::NUMBER;
+                expression_value_stack.push(res);
+
+            }
+
+        }
+    
+        context.source = expression_value_stack.top();
+        return true;
+
     }
 
     // ------------------------------------------------------------
@@ -210,7 +315,14 @@ namespace Interpreter {
                 return false;                
             }
 
-            std::cout << context.source << std::endl;
+            if ( context.source.type == Token::TokenTypeEnum::IDENTIFIER )
+            {
+                std::cout << context.variables[context.source.string].number << std::endl;
+            }
+            else
+            {
+                std::cout << context.source << std::endl;
+            }
 
             context.current_line_itor++;
             return true;
