@@ -212,11 +212,15 @@ namespace Interpreter {
             return false;
         }
 
+        // ----- REM -----
+
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_REM ) {
             Interpreter::report_execution_info(context, tokens,  "comment" );
             context.current_line_itor++;
             return true;
         }
+
+        // ----- GOTO -----
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOTO ) {
             Interpreter::report_execution_info(context, tokens,  "got goto" );
@@ -241,6 +245,8 @@ namespace Interpreter {
 
             return true;                
         }
+
+        // ----- GOSUB -----
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOSUB ) {
             Interpreter::report_execution_info(context, tokens,  "gosub" );
@@ -276,6 +282,8 @@ namespace Interpreter {
             return true;
         }
 
+        // ----- RETURN -----
+
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_RETURN ) {
             Interpreter::report_execution_info(context, tokens,  "return" );
 
@@ -286,6 +294,8 @@ namespace Interpreter {
 
             return true;
         }
+
+        // ----- INPUT -----
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_INPUT ) {
             Interpreter::report_execution_info(context, tokens,  "input" );
@@ -300,10 +310,15 @@ namespace Interpreter {
             //
             // OK IF WE GOT HERE THEN WRITE THE VALUE TO THE DESTINATION
             //
+            float tmp;
+            std::cin >> tmp;
+            context.variables[context.destination.string].number = tmp;
 
             context.current_line_itor++;
             return true;
         }
+
+        // ----- PRINT -----
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_PRINT ) {
             Interpreter::report_execution_info(context, tokens,  "got print" );
@@ -327,6 +342,8 @@ namespace Interpreter {
             context.current_line_itor++;
             return true;
         }
+
+        // ----- LET -----
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_LET ) {
             Interpreter::report_execution_info(context, tokens,  "got let" );
@@ -361,6 +378,8 @@ namespace Interpreter {
             context.current_line_itor++;
             return true;
         }
+
+        // ----- DIM (incomplete) -----
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_DIM ) {
             Interpreter::report_execution_info(context, tokens,  "dim" );
