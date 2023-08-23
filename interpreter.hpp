@@ -1,4 +1,28 @@
-// interpreter.hpp
+/*
+
+MIT License
+
+Copyright (c) 2023 sean butler
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
 
 #pragma once
 
@@ -76,7 +100,6 @@ namespace Interpreter {
         std::stack<Token> expression_value_stack;
         std::stack<Token> expression_symbol_stack;
         Token val1, val2, op, res;
-
 
         while ( ( context.current_token_itor != (*context.current_line_itor).second.end() )    
                 && ( (*context.current_token_itor).type != Token::TokenTypeEnum::KEYWORD ) 
@@ -212,7 +235,7 @@ namespace Interpreter {
             return false;
         }
 
-        // ----- REM -----
+        // ---------- REM ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_REM ) {
             Interpreter::report_execution_info(context, tokens,  "comment" );
@@ -220,7 +243,7 @@ namespace Interpreter {
             return true;
         }
 
-        // ----- GOTO -----
+        // ---------- GOTO ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOTO ) {
             Interpreter::report_execution_info(context, tokens,  "got goto" );
@@ -246,7 +269,7 @@ namespace Interpreter {
             return true;                
         }
 
-        // ----- GOSUB -----
+        // ---------- GOSUB ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOSUB ) {
             Interpreter::report_execution_info(context, tokens,  "gosub" );
@@ -282,7 +305,7 @@ namespace Interpreter {
             return true;
         }
 
-        // ----- RETURN -----
+        // ---------- RETURN ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_RETURN ) {
             Interpreter::report_execution_info(context, tokens,  "return" );
@@ -295,7 +318,7 @@ namespace Interpreter {
             return true;
         }
 
-        // ----- INPUT -----
+        // ---------- INPUT ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_INPUT ) {
             Interpreter::report_execution_info(context, tokens,  "input" );
@@ -318,32 +341,38 @@ namespace Interpreter {
             return true;
         }
 
-        // ----- PRINT -----
+        // ---------- PRINT ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_PRINT ) {
             Interpreter::report_execution_info(context, tokens,  "got print" );
 
             context.current_token_itor++;
 
-            if ( execute_rhs_expression(context, tokens) == false ) {
-                Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
-                return false;                
+            if ( (*context.current_token_itor).type == Token::TokenTypeEnum::STRING ) {
+                std::cout << (*context.current_token_itor).string << std::endl;
             }
+            else 
+            {
+                if ( execute_rhs_expression(context, tokens) == false ) {
+                    Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
+                    return false;                
+                }
 
-            if ( context.source.type == Token::TokenTypeEnum::IDENTIFIER )
-            {
-                std::cout << context.variables[context.source.string].number << std::endl;
-            }
-            else
-            {
-                std::cout << context.source << std::endl;
+                if ( context.source.type == Token::TokenTypeEnum::IDENTIFIER )
+                {
+                    std::cout << context.variables[context.source.string].number << std::endl;
+                }
+                else
+                {
+                    std::cout << context.source << std::endl;
+                }
             }
 
             context.current_line_itor++;
             return true;
         }
 
-        // ----- LET -----
+        // ---------- LET ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_LET ) {
             Interpreter::report_execution_info(context, tokens,  "got let" );
@@ -379,7 +408,7 @@ namespace Interpreter {
             return true;
         }
 
-        // ----- DIM (incomplete) -----
+        // ---------- DIM (incomplete) ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_DIM ) {
             Interpreter::report_execution_info(context, tokens,  "dim" );
@@ -431,6 +460,7 @@ namespace Interpreter {
             status = execute_token_vector(context, tokens);
             
         }
-    }
-}
 
+    }
+
+}

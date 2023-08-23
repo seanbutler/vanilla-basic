@@ -1,4 +1,8 @@
-100 let x = 0
-110 input x
-120 let x = x + 1
-130 print x
+50 print "please enter your age..."
+
+100 let age = 0
+110 input age
+120 let age = age + 1
+150 print "you are ..."
+160 print age
+170 print "years old (computers never make mistakes)"
