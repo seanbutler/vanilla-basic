@@ -101,10 +101,14 @@ namespace Interpreter {
         std::stack<Token> expression_symbol_stack;
         Token val1, val2, op, res;
 
-        while ( ( context.current_token_itor != (*context.current_line_itor).second.end() )    
+        while ( ( context.current_token_itor != (*context.current_line_itor).second.end() )
                 && ( (*context.current_token_itor).type != Token::TokenTypeEnum::KEYWORD ) 
-                &&  ( (*context.current_token_itor).symbol != Token::SymbolEnum::TOK_RBRACKET ) )  
+                &&  ( (*context.current_token_itor).symbol != Token::SymbolEnum::TOK_RBRACKET ) )
         {
+            // if ( (*context.current_token_itor).token == Token::TokenEnum::TOK_L ) 
+            // {
+            //     expression_symbol_stack.push((*context.current_token_itor));
+            // }
             if ((*context.current_token_itor).type == Token::TokenTypeEnum::NUMBER ) 
             {
                 expression_value_stack.push((*context.current_token_itor));
@@ -122,7 +126,6 @@ namespace Interpreter {
 
             while ( !expression_symbol_stack.empty() && ( expression_value_stack.size() >= 2 ) )
             {
-
                 //
                 // get the 2 values
                 //
@@ -144,9 +147,8 @@ namespace Interpreter {
                 else // assume its a value
                 {
                     val1 = expression_value_stack.top().number;
-                }                
+                }                 
                 expression_value_stack.pop();
-
 
                 //
                 // get the operator
