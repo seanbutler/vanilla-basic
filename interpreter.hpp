@@ -64,7 +64,7 @@ namespace Interpreter {
                                     std::map<unsigned int, std::vector<Token>> & tokens,
                                     const std::string & message ) 
     {
-        return;
+        // return;
 
         std::cerr << context.filename
                 << " (" << (*context.current_line_itor).first << ") : info - " 
@@ -307,6 +307,49 @@ namespace Interpreter {
             return true;
         }
 
+        // ---------- WHILE ----------
+
+        if ((*context.current_token_itor).token == Token::TokenEnum::TOK_WHILE ) {
+            Interpreter::report_execution_info(context, tokens,  "got while (using print)" );
+
+            context.current_token_itor++;
+
+            if ( (*context.current_token_itor).type == Token::TokenTypeEnum::STRING ) {
+                std::cout << (*context.current_token_itor).string << std::endl;
+            }
+            else 
+            {
+                if ( execute_rhs_expression(context, tokens) == false ) {
+                    Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
+                    return false;                
+                }
+
+                if ( context.source.type == Token::TokenTypeEnum::IDENTIFIER )
+                {
+                    std::cout << context.variables[context.source.string].number << std::endl;
+                }
+                else
+                {
+                    std::cout << context.source << std::endl;
+                }
+            }
+
+            context.current_line_itor++;
+            return true;
+        }
+
+
+        // ---------- WEND ----------
+
+        if ((*context.current_token_itor).token == Token::TokenEnum::TOK_ENDWHILE ) {
+            Interpreter::report_execution_info(context, tokens,  "endwhile/wend" );
+
+
+            context.current_line_itor++;
+            return true;
+        }
+
+
         // ---------- RETURN ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_RETURN ) {
@@ -319,6 +362,7 @@ namespace Interpreter {
 
             return true;
         }
+
 
         // ---------- INPUT ----------
 
@@ -342,6 +386,7 @@ namespace Interpreter {
             context.current_line_itor++;
             return true;
         }
+
 
         // ---------- PRINT ----------
 
@@ -373,6 +418,7 @@ namespace Interpreter {
             context.current_line_itor++;
             return true;
         }
+
 
         // ---------- LET ----------
 

@@ -109,7 +109,6 @@ public:
         "TOK_REM",
     };
 
-
     inline static std::string _symbols_debug_table[] = {
         "?",
         "=",

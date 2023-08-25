@@ -1,4 +1,8 @@
-50 print "please enter your age..."
+
+
+10 goto 4000
+
+90 print "please enter your age..."
 100 let age = 0
 110 input age
 120 let age = age + 1
@@ -20,3 +24,11 @@
 3020 print "end"
 
 
+4000 print "while loop"
+4010 let counter = 99
+4020 while counter > 0
+4030 let counter = counter - 1
+4040 print counter
+4050 wend
+
+5000 print "all done"
