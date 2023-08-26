@@ -42,7 +42,16 @@ Parses and executes BASIC code like this...
 ~~~
 
 ~~~ basic
-4000 print "prints some numbers out, demos for loops, and thats it"
+5000 print "repeat until loop"
+5010 let counter = 10
+5020 repeat 
+5030 let counter = counter - 1
+5040 print counter
+5050 until counter <= 0
+~~~
+
+~~~ basic
+4000 print "prints some numbers out, demos nexted for loops"
 4010 for xpos = 1 to 10
 4015 for ypos = 1 to 10
 4020 print xpos
@@ -51,12 +60,19 @@ Parses and executes BASIC code like this...
 4035 next
 ~~~
 
+
 ## language features include
 
 - **rem** 
   - single line comments
 - **goto** expression
   - jumps/continues execution at the line which has the number equal to the result of the expression
+- **expressions v1**
+  - expr :== const | identifier
+  - expr ::= expr op expr
+  - expr ::= expr rop expr
+  - op ::= + - * / etc
+  - rop ::= >= <= etc
 - **gosub** expression 
 - **return**
   - similar to goto except the line jumped from is stored on a stack and retrieved for a jump using the return command 
@@ -66,15 +82,32 @@ Parses and executes BASIC code like this...
   - outputs result of the expression once evaluated to std::cout 
 - **let** lhs_expression **=** expression
   - assignment 
+- **repeat until** 
+  - bottom comparison
+  - jump back fom bottom
 
 ## todo
 
-- **loops** 
-  - various loops while, for, etc
-- **dim** 
+- **expressions v2**
+  - expressions now include brackets
+  - expr ::= ( expr )
+- **while wend** 
+  - top comparison
+  - jump forward over optinal OR jump back from bottom?
+- **for loop** 
+  - top comparison
+  - counter logic
+  - jump back fom bottom
+- **array declaration and access** 
   - dim identifier ( expression )
+  - identifier [ expression ]
+- **arrays evaluated correctly in rhs expressions** 
+  -  lhs = identifier ( expression )
+- **arrays evaluated correctly in lhs expressions** 
+  -  expression op identifier [ expression ] op expression = rhs
 - **sigils** 
   - for types $ for text and % for numbers
+  - how do strings interract with expressions?
 - **TUI** 
   - ncurses or similar
 - **Graphics** 
@@ -83,6 +116,8 @@ Parses and executes BASIC code like this...
   - expose the interpreter via API to the language
 - **threads** 
   - exactly how tbd
+  - perhaps each BASIC file is a thread?
+  - and spawn ( fname ) ?
 
 
 ## Instructions
@@ -103,3 +138,4 @@ make
 ### windows / osx
 
 please help
+
