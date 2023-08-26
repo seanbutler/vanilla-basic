@@ -82,6 +82,8 @@ namespace tokenizer
 
         { "while",      Token::TokenEnum::TOK_WHILE    },
         { "wend",       Token::TokenEnum::TOK_ENDWHILE },
+        { "repeat",     Token::TokenEnum::TOK_REPEAT    },
+        { "until",      Token::TokenEnum::TOK_UNTIL },
 
         { "input",      Token::TokenEnum::TOK_INPUT    },
         { "print",      Token::TokenEnum::TOK_PRINT    },
