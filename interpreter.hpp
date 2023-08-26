@@ -39,7 +39,8 @@ namespace Interpreter {
         std::string filename;
         std::map<unsigned int, std::vector<Token>>::iterator current_line_itor;
         std::vector<Token>::iterator current_token_itor;
-        std::stack<std::map<unsigned int, std::vector<Token>>::iterator> gosub_return_destination_stack;
+        std::stack<std::map<unsigned int, std::vector<Token>>::iterator> gosub_return_destination_stack;    // forward
+        std::stack<std::map<unsigned int, std::vector<Token>>::iterator> repeat_until_destination_stack;    // backward
         std::map<std::string, Token> variables;
 
         Token source;
@@ -54,7 +55,7 @@ namespace Interpreter {
     {
         std::cerr << context.filename
                 << " (" << (*context.current_line_itor).first << ") : error - " 
-                << message
+                << message 
                 << " at or near " 
                 << (*context.current_token_itor) 
                 << std::endl;
@@ -237,7 +238,7 @@ namespace Interpreter {
             return false;
         }
 
-        // ---------- REM ----------
+        // ---------- REM ----------------------------------------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_REM ) {
             Interpreter::report_execution_info(context, tokens,  "comment" );
@@ -245,7 +246,7 @@ namespace Interpreter {
             return true;
         }
 
-        // ---------- GOTO ----------
+        // ---------- GOTO ----------------------------------------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOTO ) {
             Interpreter::report_execution_info(context, tokens,  "got goto" );
@@ -271,7 +272,7 @@ namespace Interpreter {
             return true;                
         }
 
-        // ---------- GOSUB ----------
+        // ---------- GOSUB ----------------------------------------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOSUB ) {
             Interpreter::report_execution_info(context, tokens,  "gosub" );
@@ -286,13 +287,11 @@ namespace Interpreter {
             //
             //  SET LINE RETURN VARIABLE TO THE TO CURRENT LINE
             //
-
             context.gosub_return_destination_stack.push(context.current_line_itor++); 
 
             //
             //  SET LINE ITERATOR TO THE DESTINATION
             //
-
             if ( context.source.type == Token::TokenTypeEnum::NUMBER )
             {
                 context.current_line_itor = tokens.find(context.source.number);
@@ -307,7 +306,55 @@ namespace Interpreter {
             return true;
         }
 
-        // ---------- RETURN ----------
+        // ---------- REPEAT ----------------------------------------
+
+        if ((*context.current_token_itor).token == Token::TokenEnum::TOK_REPEAT ) {
+            Interpreter::report_execution_info(context, tokens,  "got repeat" );
+
+            context.current_token_itor++;
+
+            context.repeat_until_destination_stack.push(context.current_line_itor); 
+
+            context.current_line_itor++;
+            return true;
+        }
+
+        // ---------- UNTIL ----------------------------------------
+
+        if ((*context.current_token_itor).token == Token::TokenEnum::TOK_UNTIL ) {
+            Interpreter::report_execution_info(context, tokens,  "got until" );
+
+            context.current_token_itor++;
+
+            if ( execute_rhs_expression(context, tokens) == false ) {
+                Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
+                return false;                
+            }
+
+            if ( context.source.type == Token::TokenTypeEnum::IDENTIFIER )
+            {
+                // std::cout << context.variables[context.source.string].number << std::endl;
+                if ( context.variables[context.source.string].number == 0.0f )
+                {
+                    context.current_line_itor = context.repeat_until_destination_stack.top(); 
+                    // context.repeat_until_destination_stack.pop(); 
+                }
+            }
+            else
+            {
+                // std::cout << context.source << std::endl;
+                if ( context.source.number == 0.0f) 
+                {
+                    context.current_line_itor = context.repeat_until_destination_stack.top();
+                    // context.repeat_until_destination_stack.pop();
+                }
+            }
+
+            context.current_line_itor++;
+            return true;
+        }
+
+        // ---------- RETURN ----------------------------------------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_RETURN ) {
             Interpreter::report_execution_info(context, tokens,  "return" );
@@ -319,6 +366,7 @@ namespace Interpreter {
 
             return true;
         }
+
 
         // ---------- INPUT ----------
 
@@ -342,6 +390,7 @@ namespace Interpreter {
             context.current_line_itor++;
             return true;
         }
+
 
         // ---------- PRINT ----------
 
@@ -373,6 +422,7 @@ namespace Interpreter {
             context.current_line_itor++;
             return true;
         }
+
 
         // ---------- LET ----------
 
@@ -459,10 +509,10 @@ namespace Interpreter {
         bool status = true;
 
         while ( ( context.current_line_itor != tokens.end() && status != false )) {
-            status = execute_token_vector(context, tokens);
-            
+            status = execute_token_vector(context, tokens);        
         }
 
     }
+
 
 }

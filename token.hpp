@@ -90,8 +90,9 @@ public:
         TOK_LET, 
         TOK_DIM, 
         TOK_IF, TOK_THEN,
-        TOK_FOR, TOK_TO, TOK_NEXT,
+        TOK_REPEAT, TOK_UNTIL,
         TOK_WHILE, TOK_ENDWHILE,
+        TOK_FOR, TOK_TO, TOK_NEXT,
         TOK_INPUT, TOK_PRINT,
         TOK_GOTO, TOK_GOSUB, TOK_RETURN, 
         TOK_REM
@@ -102,13 +103,13 @@ public:
         "TOK_LET", 
         "TOK_DIM", 
         "TOK_IF", "TOK_THEN",
-        "TOK_FOR", "TOK_TO", "TOK_NEXT",
+        "TOK_REPEAT", "TOK_UNTIL",
         "TOK_WHILE", "TOK_ENDWHILE",
+        "TOK_FOR", "TOK_TO", "TOK_NEXT",
         "TOK_INPUT", "TOK_PRINT",
         "TOK_GOTO", "TOK_GOSUB", "TOK_RETURN", 
         "TOK_REM",
     };
-
 
     inline static std::string _symbols_debug_table[] = {
         "?",
