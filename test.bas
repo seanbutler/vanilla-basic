@@ -1,5 +1,5 @@
 
-10 rem goto 4000
+10 rem goto 5000
 
 90 print "please enter your age..."
 100 let age = 0
@@ -32,13 +32,11 @@
 4060 print "end repeats"
 
 
-5000 print "for next loops"
-5010 for xpos = 1 to 10
-5020 for ypos = 1 to 10
+5000 print "for next loop"
+5010 let maxx = 10
+5010 for xpos = 1 to maxx
 5030 print xpos
-5040 print ypos
-5050 next>
 5060 next
-5070 print "end for nexts"
+5070 print "end for next loop"
 
 6000 print "all done"

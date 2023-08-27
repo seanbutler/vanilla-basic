@@ -39,8 +39,9 @@ namespace Interpreter {
         std::string filename;
         std::map<unsigned int, std::vector<Token>>::iterator current_line_itor;
         std::vector<Token>::iterator current_token_itor;
-        std::stack<std::map<unsigned int, std::vector<Token>>::iterator> gosub_return_destination_stack;    // forward
+        std::stack<std::map<unsigned int, std::vector<Token>>::iterator> gosub_return_destination_stack;    // any direction, returns unconditionally
         std::stack<std::map<unsigned int, std::vector<Token>>::iterator> repeat_until_destination_stack;    // backward
+        std::stack<std::map<unsigned int, std::vector<Token>>::iterator> for_loop_stack;                    // special
         std::map<std::string, Token> variables;
 
         Token source;
@@ -106,7 +107,7 @@ namespace Interpreter {
                 && ( (*context.current_token_itor).type != Token::TokenTypeEnum::KEYWORD ) 
                 &&  ( (*context.current_token_itor).symbol != Token::SymbolEnum::TOK_RBRACKET ) )
         {
-            // if ( (*context.current_token_itor).token == Token::TokenEnum::TOK_L ) 
+            // if ( (*context.current_token_itor).token == Token::TokenEnum::TOK_LBRACKET ) 
             // {
             //     expression_symbol_stack.push((*context.current_token_itor));
             // }
@@ -391,6 +392,12 @@ namespace Interpreter {
                 return false;                
             }
 
+            // std::cout << "dest " << context.destination.string << " = " << context.destination.number << std::endl;
+            // std::cout << "source " << context.source.string << " = " << context.source.number << std::endl;
+
+            context.variables[context.destination.string] = context.source;
+
+
             if ( (*context.current_token_itor).token != Token::TokenEnum::TOK_TO )
             { 
                 Interpreter::report_execution_error(context, tokens,  "expected to after for" );
@@ -399,11 +406,18 @@ namespace Interpreter {
 
             context.current_token_itor++;
 
-            if ( execute_rhs_expression(context, tokens) == false ) 51
+            if ( execute_rhs_expression(context, tokens) == false )
             {
                 Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
                 return false;                
             }
+
+            // std::tuple<unsigned int, 
+            //     std::map<unsigned int, std::vector<Token>>::iterator, 
+            //     std::string, 
+            //     float> & looper;
+
+            context.for_loop_stack.push(context.current_line_itor);
 
             context.current_line_itor++;
             return true;
@@ -412,6 +426,9 @@ namespace Interpreter {
         if ( (*context.current_token_itor).token == Token::TokenEnum::TOK_NEXT ) 
         {
             Interpreter::report_execution_info(context, tokens,  "got next" );
+
+            context.current_line_itor = context.for_loop_stack.top();
+
 
             context.current_line_itor++;
             return true;
@@ -496,10 +513,6 @@ namespace Interpreter {
                 Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
                 return false;                
             }
-
-            //
-            // OK IF WE GOT HERE THEN WRITE THE VALUE TO THE DESTINATION
-            //
 
             context.variables[context.destination.string] = context.source;
 
