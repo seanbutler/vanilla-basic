@@ -238,7 +238,7 @@ namespace Interpreter {
             return false;
         }
 
-        // ---------- REM ----------------------------------------
+        // ---------- REM ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_REM ) {
             Interpreter::report_execution_info(context, tokens,  "comment" );
@@ -246,7 +246,7 @@ namespace Interpreter {
             return true;
         }
 
-        // ---------- GOTO ----------------------------------------
+        // ---------- GOTO ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOTO ) {
             Interpreter::report_execution_info(context, tokens,  "got goto" );
@@ -272,7 +272,7 @@ namespace Interpreter {
             return true;                
         }
 
-        // ---------- GOSUB ----------------------------------------
+        // ---------- GOSUB ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_GOSUB ) {
             Interpreter::report_execution_info(context, tokens,  "gosub" );
@@ -306,7 +306,20 @@ namespace Interpreter {
             return true;
         }
 
-        // ---------- REPEAT ----------------------------------------
+        // ---------- RETURN ----------
+
+        if ((*context.current_token_itor).token == Token::TokenEnum::TOK_RETURN ) {
+            Interpreter::report_execution_info(context, tokens,  "return" );
+
+            context.current_line_itor = context.gosub_return_destination_stack.top(); 
+            context.gosub_return_destination_stack.pop(); 
+
+            context.current_line_itor++;
+
+            return true;
+        }
+
+        // ---------- REPEAT / UNTIL ----------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_REPEAT ) {
             Interpreter::report_execution_info(context, tokens,  "got repeat" );
@@ -318,8 +331,6 @@ namespace Interpreter {
             context.current_line_itor++;
             return true;
         }
-
-        // ---------- UNTIL ----------------------------------------
 
         if ((*context.current_token_itor).token == Token::TokenEnum::TOK_UNTIL ) {
             Interpreter::report_execution_info(context, tokens,  "got until" );
@@ -354,19 +365,57 @@ namespace Interpreter {
             return true;
         }
 
-        // ---------- RETURN ----------------------------------------
+        // ---------- FOR / NEXT ----------
 
-        if ((*context.current_token_itor).token == Token::TokenEnum::TOK_RETURN ) {
-            Interpreter::report_execution_info(context, tokens,  "return" );
+        if ( (*context.current_token_itor).token == Token::TokenEnum::TOK_FOR )
+        { 
+            Interpreter::report_execution_info(context, tokens,  "got for" );
+            context.current_token_itor++;
 
-            context.current_line_itor = context.gosub_return_destination_stack.top(); 
-            context.gosub_return_destination_stack.pop(); 
+            if ( execute_lhs_expression(context, tokens) == false) {
+                Interpreter::report_execution_error(context, tokens,  "expression lhs execution problem" );
+                return false;
+            }
+
+            context.current_token_itor++;
+
+            if ((*context.current_token_itor).symbol != Token::SymbolEnum::TOK_EQUALS ) {
+                Interpreter::report_execution_error(context, tokens,  "expected equals/assignment after expression lhs" );
+                return false;                
+            }
+
+            context.current_token_itor++;
+
+            if ( execute_rhs_expression(context, tokens) == false ) {
+                Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
+                return false;                
+            }
+
+            if ( (*context.current_token_itor).token != Token::TokenEnum::TOK_TO )
+            { 
+                Interpreter::report_execution_error(context, tokens,  "expected to after for" );
+                return false;
+            }
+
+            context.current_token_itor++;
+
+            if ( execute_rhs_expression(context, tokens) == false ) 51
+            {
+                Interpreter::report_execution_error(context, tokens,  "expression rhs execution problem" );
+                return false;                
+            }
 
             context.current_line_itor++;
-
             return true;
         }
 
+        if ( (*context.current_token_itor).token == Token::TokenEnum::TOK_NEXT ) 
+        {
+            Interpreter::report_execution_info(context, tokens,  "got next" );
+
+            context.current_line_itor++;
+            return true;
+        }
 
         // ---------- INPUT ----------
 
@@ -390,7 +439,6 @@ namespace Interpreter {
             context.current_line_itor++;
             return true;
         }
-
 
         // ---------- PRINT ----------
 
@@ -422,7 +470,6 @@ namespace Interpreter {
             context.current_line_itor++;
             return true;
         }
-
 
         // ---------- LET ----------
 

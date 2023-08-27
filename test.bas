@@ -1,5 +1,5 @@
 
-10 goto 5000
+10 rem goto 4000
 
 90 print "please enter your age..."
 100 let age = 0
@@ -21,20 +21,24 @@
 
 3000 print "subroutine at line 3000"
 3010 return
-3020 print "end"
+3020 print "end subroutines"
 
-4000 print "while wend loop"
-4010 let counter = 99
-4020 while counter > 0
+4000 print "repeat until loop"
+4010 let counter = 10
+4020 repeat 
 4030 let counter = counter - 1
 4040 print counter
-4050 wend
+4050 until counter <= 0
+4060 print "end repeats"
 
-5000 print "repeat until loop"
-5010 let counter = 10
-5020 repeat 
-5030 let counter = counter - 1
-5040 print counter
-5050 until counter <= 0
+
+5000 print "for next loops"
+5010 for xpos = 1 to 10
+5020 for ypos = 1 to 10
+5030 print xpos
+5040 print ypos
+5050 next>
+5060 next
+5070 print "end for nexts"
 
 6000 print "all done"
